@@ -1,0 +1,65 @@
+/* TASK
+
+You are given a list of roles and a script for the play as an array of lines.
+
+Each line of the play script is presented as follows:
+Role: text
+
+The text can contain any characters.
+
+Write a method that will group lines by role, number them, and return the result in the form of ready-made text (see example). Each group is printed as follows:
+
+Role:
+i) text
+j) text2
+...
+== line feed ==
+
+i and j are line numbers in the script. Row indexing begins with one, groups should be displayed in accordance with the order of roles. Line breaks between groups are required, line breaks at the end of the text are not taken into account.
+
+Note that you have to process a huge piece of 50,000 lines for 10 roles - accordingly, incorrect assembly of the resulting line may exceed the time limit.
+
+Pay attention to a few more nuances:
+
+a character's name can appear more than once in a line, including a colon;
+the name of one role can be a prefix of the name of another role (for example, "Luka" and "Luka Lukic");
+a role that does not have replicas must also be present in the output file;
+use the '\ n' character (UNIX style line feed) as a line feed;
+be careful not to add extra spaces at the end of lines.
+
+*/
+
+private static String printTextPerRole(String[] roles, String[] textLines) {
+
+    StringBuilder result = new StringBuilder(""); // чтобы легче было работать со String использую String Builder куда буду записывать результаты (окончательный ответ)
+    StringBuilder[] results = new StringBuilder[roles.length]; // Создаю массив String Builder так как он имеет необходимые методы для работы
+    
+    int linesNumber = 1; // считаю номер текста который говорят чтобы вывести его как порядок
+    int positionOfColon, rolesIndex;
+    HashMap hashMapByRoles = new HashMap(); // использую hash Map чтобы связать роли и текст ролей как ключ - значение
+
+    for (int rI = 0; rI < roles.length; rI++) {// заполняю массив results по ролям и добовляю двоеточие с новой строкой + массив вставляю как ключ к hashMap
+        results[rI] = new StringBuilder(roles[rI].subSequence(0, roles[rI].length()));
+        results[rI] = results[rI].append(":\n");
+        hashMapByRoles.put(roles[rI], rI);
+    }
+
+    for (String textLine : textLines) {// по примеру (for auto) перебираю все String из массива textLines
+        if (textLine.isEmpty()) {// если нечего нет в строке то просто игнорирую все что дальше и перехожу к следующему массиву
+            continue;
+        }
+        positionOfColon = textLine.indexOf(": "); // в переменную записываю индекс двоеточия
+        String roleInLine = textLine.substring(0, positionOfColon); // в переменную записываю текст роли (все что дальше двоеточия)
+        StringBuilder rolesTextInLine = new StringBuilder (textLine.substring(positionOfColon + 2));
+        rolesIndex = (int)hashMapByRoles.get(roleInLine); // получаю индекс роли из hashmap по названию роли
+        results[rolesIndex] = results[rolesIndex].append(linesNumber +") ").append(rolesTextInLine).append("\n");// в массив дополняю тест и порядковый номер. Теперь каждый массив выглядит так: "Роль:(\n)номер) текст"
+        linesNumber++;
+    }
+    
+     for (StringBuilder rolesString : results) { // заполняю все массивы в 1 String для вывода результата
+        result = result.append(rolesString).append("\n");
+     }
+    
+     return result.toString();
+    }
+
