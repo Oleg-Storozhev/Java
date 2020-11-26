@@ -1,0 +1,30 @@
+/*TASK
+Implement a method that lets other methods know where they were called from.
+
+The getCallerClassAndMethodName () method must return the name of the class and method from which the method that called this utility method was called. Or null (a null reference, not the string "null") if the method that called getCallerClassAndMethodName () is the entry point to the program, i.e. no one called him.
+
+This is relevant, for example, in logging libraries, where for each message in the log it is necessary to display the class and method from which the message was logged.
+*/
+
+public static String getCallerClassAndMethodName() {
+    
+    StackTraceElement[] stackTraceElements = new Exception().getStackTrace();
+    System.out.println("stackTraceElements contains " + stackTraceElements.length + " records.");
+    String Output = "";
+    
+    for (StackTraceElement stackTraceElement : stackTraceElements) {
+        Output = "";
+        Output = stackTraceElement.getClassName() + "#" + stackTraceElement.getMethodName();
+        System.out.println(Output);
+    }
+    
+    System.out.println("\n");
+    
+    if (stackTraceElements.length <= 2) {
+            return null;
+    } 
+    
+    Output = stackTraceElements[2].getClassName().toString()+"#"+stackTraceElements[2].getMethodName().toString();
+    
+    return Output;
+}
