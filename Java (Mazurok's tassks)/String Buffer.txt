@@ -1,0 +1,69 @@
+import java.util.*;
+import java.lang.*;
+
+public class Ideone {
+    private static String deleteVowels (String Str) { // Удалить все гласные буквы (задание 2)
+        return Str.replaceAll("[A,a,E,e,U,u,I,i,O,o]", "");
+    }
+
+    private static String sort (String Str) { // Сортировать строку методом (задание 3)
+        Str.replaceAll(" ", "");
+        StringBuffer sorted = new StringBuffer(Str);
+        boolean check= false;
+        char[] letter = Str.toCharArray();
+        for(int i = 1; i < letter.length; i++){
+            char key = letter[i];
+            int  j = i-1;
+            while(j >= 0){
+                if(letter[j] > key){
+                    break;
+                }
+                letter[j+1] = letter[j];
+                sorted.replace(j+1,j+2, String.valueOf(letter[j]));
+                j--;
+            }
+            letter[j + 1] = key;
+            sorted.replace(j+1,j+2, String.valueOf(key));
+        }
+        sorted = sorted.reverse();
+        return sorted.toString();
+    }
+
+    private static String Buffer_and_String(String str){ // Из String в StringBuffer и назад (задание 4)
+        StringBuffer buffer = new StringBuffer(str);
+        String str2 = buffer.toString();
+        return str2;
+    }
+    private static StringBuffer Buffer_and_Array(StringBuffer str){ // Из StringBuffer в массив и назад (задание 5)
+        String a = str.toString();
+        char [] array = a.toCharArray();
+        StringBuffer str2 = new StringBuffer("");
+        for(int i = 0; i < array.length; i++){
+            str2.insert(i, array[i]);
+        }
+        return str2;
+    }
+    private static StringBuffer Mixing(StringBuffer str){ // перетасуйте символы обхекта StringBuffer (задние 6)
+        int n = str.length();
+        Random rand = new Random();
+        while ( n > 1 ) {
+            int randomPoint = rand.nextInt( n );
+            char randomChar = str.charAt( randomPoint );
+            str.setCharAt( n-1, randomChar );
+            n--;
+        }
+        return str;
+    }
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        String a = input.nextLine();
+        StringBuffer buffer = new StringBuffer(a);
+
+        System.out.println("deleteVowels " + deleteVowels(a));
+        System.out.println("sort " + sort(a));
+        System.out.println("Buffer_and_String " + Buffer_and_String(a));
+        System.out.println("Buffer_and_Array " + Buffer_and_Array(buffer).toString());
+        System.out.println("Mixing " + Mixing(buffer).toString());
+    }
+}

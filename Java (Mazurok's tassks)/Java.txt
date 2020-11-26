@@ -1,0 +1,159 @@
+0) https://ideone.com/LxWq8G
+
+class demoString{
+	public static void main (String a[]){
+		// Задание 0
+		String x = new String("HELLO! How are u?");
+		char [] xChars = x.toCharArray(); // переводит стринг в массивы char
+		char[] vowels = {'a','e','i','o','u'};
+		boolean check;
+		for(int i = 0; i < xChars.length; i++){
+			check = true;
+			for(int j = 0; j < vowels.length; j++){
+				if(vowels[j] == xChars[i]){
+					check = false;
+					break;
+				}
+			}
+			if(check){
+				System.out.print(xChars[i]);
+			}
+		}
+ 
+	}
+}
+
+1)https://ideone.com/16khc6
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+ 
+class demoString{
+	public static void main (String arg[]){
+		Scanner input = new Scanner(System.in);
+		String x = input.nextLine();
+ 
+		for(String word: x.split(" ")){ // разделяю на слова
+			char [] letter = word.toCharArray(); // перевожу в массив символов
+			Arrays.sort(letter); // сортирую
+			word = Arrays.toString(letter); // перевожу в стринг
+			System.out.println(word);
+		}
+	}
+}
+
+
+2)https://ideone.com/faIA26
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+ 
+/* Name of the class has to be "Main" only if the class is public. */
+class Ideone{
+	public static void main (String[] args) throws java.lang.Exception{
+		Scanner input = new Scanner(System.in);
+		String s1 = input.nextLine();
+		char c;
+		for(String words : s1.split(" ")){ // разделяю по словам
+			if(words.toLowerCase().equals("the") || words.toLowerCase().equals("of") || words.toLowerCase().equals("a")){ // если the of a то игнорируем (переводи все в нижний регистр на случай если пользователь писал в CAPSE LOCK)
+				continue;
+			}
+			c = words.charAt(0); // Первая букава слова
+			System.out.print(Character.toUpperCase(c)); // верхний регистр
+		}
+	}
+}
+
+4) https://ideone.com/jH5YUL
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+class Ideone{
+    static boolean Polindrom(String a){
+        a = a.replaceAll("[^A-Za-zА-Яа-я0-9]", ""); // Убираю все кроме букв и чисел
+        a = a.toLowerCase(); //  переводим все в строк нижнего регистра
+        StringBuilder b = new StringBuilder();
+        b.append(a);
+        b = b.reverse();
+        String a2 = new String();
+        a2 = b.toString();
+        return (a2.equals(a)); // проверка на равность
+    }
+ 
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        String a = input.nextLine();
+        System.out.print(Polindrom (a));
+    }
+}
+
+6) https://ideone.com/oGceeU
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+ 
+class Ideone{
+ 
+	static String TheLongest(String a){
+        char albabet; // переменая - проверка на алфавит
+        int count; // счетчик
+        int max = 0;
+        String s = new String();
+        String LongString = null;
+        for(String word: a.split(" ")){ // разделяю строку на слова
+            albabet = word.charAt(0); // выделяю первый символ и начинаю проверку от него
+            albabet = Character.toLowerCase(albabet); // На всякий переводим на нижный регистр
+            count = 0; // обнуляю счетчик
+            s = "";
+            for(char letter: word.toCharArray()){
+                if(Character.toLowerCase(letter) == albabet){ // нижний регистр
+                    albabet++;
+                    count++;
+                }
+                else if(Character.toLowerCase(letter) != (char)albabet-1){ // если символ такой же как прошлый (например aaab - по факту по алфовиту так как после a идет b и но счетчик будет на 2) если же нет то уже дальше идет не по алфовиту и можно разрывать цикл
+                    break;
+                }
+                s+=letter;
+            }
+            if(count > max){
+                max = count;
+                LongString = s; // цепочка букв по алфовиту
+            }
+        }
+        return LongString;
+    }
+ 
+	public static void main (String[] args) throws java.lang.Exception{
+		Scanner input = new Scanner(System.in);
+        String a = input.nextLine();
+        System.out.print(TheLongest(a));
+	}
+}
+
+7) https://ideone.com/0wEdzb
+
+import java.util.*;
+import java.lang.*;
+import java.io.*;
+ 
+/* Name of the class has to be "Main" only if the class is public. */
+class Ideone{
+	static void Shifr(String a){
+        for(String word: a.split(" ")){
+            for(char letter : word.toCharArray()){
+                System.out.print((letter+18) + " "); // Каждую букву шифруем числом по ASCII code + 18 и записываем через пробел
+            }
+            System.out.println(""); // каждое новое число записываем с новой строки
+        }
+    }
+ 
+	public static void main (String[] args) throws java.lang.Exception{
+		Scanner input = new Scanner(System.in);
+        String a = input.nextLine();
+        Shifr(a);
+	}
+}
