@@ -1,0 +1,57 @@
+/* TASK
+
+Given a ComplexNumber class. Reimplement the equals () and hashCode () methods in it so that equals () compares ComplexNumber instances by the contents of the re and im fields, and hashCode () is consistent with the equals () implementation.
+
+Implementation of hashCode () that returns a constant or does not take into account the fractional part of re and im will not be counted
+
+*/
+
+public final class ComplexNumber {
+    private final double re;
+    private final double im;
+
+    public ComplexNumber(double re, double im) {
+        this.re = re;
+        this.im = im;
+    }
+
+    public double getRe() {
+        return re;
+    }
+
+    public double getIm() {
+        return im;
+    }
+    
+    public boolean equals(Object b){
+        /*Double aRe = re;
+        Double aIm = im;
+        Double bRe = b.getRe();
+        Double bIm = b.getIm();
+        if(aRe.equals(bRe) && aIm.equals(bIm)){
+            return true;
+        }
+        return false;*/
+        if (b == this) {
+            return true;
+        }
+        if (b == null || b.getClass() != this.getClass()) {
+            return false;
+        }
+        ComplexNumber a = (ComplexNumber) b;
+
+        if (Double.compare(a.re, re) != 0) {
+            return false;
+        }
+        return Double.compare(a.im, im) == 0;
+    }
+    public int hashCode(){
+        int result;
+        long a;
+        a = Double.doubleToLongBits(re);
+        result = (int)(a - (a >>> 32));
+        a = Double.doubleToLongBits(im);
+        result = 31*result + (int)(a - (a >>> 32));
+        return result;
+    }
+}
