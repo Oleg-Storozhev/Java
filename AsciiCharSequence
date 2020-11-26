@@ -1,0 +1,47 @@
+/* TASK
+Write an AsciiCharSequence class that implements compact storage of a sequence of ASCII characters (their codes fit into one byte) in a byte array. Compared to the String class, which stores each character as a char, AsciiCharSequence will consume half the memory.
+
+The AsciiCharSequence class must:
+
+implement the java.lang.CharSequence interface;
+have a constructor that takes an array of bytes;
+define methods length (), charAt (), subSequence () and toString ()
+See the java.lang.CharSequence interface (JavaDoc or sources) for method signatures and expectations for their behavior.
+
+In this task, the charAt () and subSequence () methods will always be supplied with correct input parameters, so there is no need to check them and handle errors. Moreover, we have not yet passed the exception.
+*/
+
+public class AsciiCharSequence implements CharSequence {
+    private final byte value[];
+    private int hash = 0;
+    public AsciiCharSequence(){
+        this.value = new String("").getBytes();
+    }
+    public AsciiCharSequence(byte value[]) {
+        this.value = value;
+        this.hash = hashCode();
+    }
+    public int length() {
+        return value.length;
+    }
+    public char charAt(int index) {
+        return (char)value[index];
+    }
+    public String toString() {
+        return new String(this.value);
+    }
+    public AsciiCharSequence(byte value[], int offset, int count) {
+        if (count <= 0 && offset <= value.length) {
+            this.value = "".getBytes();
+            return;
+        }
+        this.value = Arrays.copyOfRange(value, offset, offset+count);
+    }
+    public CharSequence subSequence(int start, int end) {
+        int subLen = end - start;
+        if((start == 0) && (end == value.length)){
+            return this;
+        }
+        return new AsciiCharSequence(value, start, subLen);
+    }
+}
