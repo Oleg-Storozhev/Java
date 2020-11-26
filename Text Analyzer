@@ -1,0 +1,112 @@
+/* TASK
+Let's say you are making a comment filtering system on some web portal, whether it be news, video hosting, or maybe even for an online training system
+
+You want to filter comments by different criteria, be able to easily add new filters and modify old ones.
+
+Let's say we are filtering spam, comments with negative content, and overly long comments.
+We will filter spam by the presence of the specified keywords in the text.
+We will define negative content by the presence of one of three emoticons - :( = (: |
+Too long comments will be determined based on the given number - the maximum comment length.
+
+You decided to abstract the filter into the following interface:
+interface TextAnalyzer {
+    Label processText (String text);
+}
+Label is an enumeration type that contains labels with which we will mark the text:
+enum Label {
+    SPAM, NEGATIVE_TEXT, TOO_LONG, OK
+}
+Next, you need to implement three classes that implement this interface: SpamAnalyzer, NegativeTextAnalyzer, and TooLongTextAnalyzer.
+SpamAnalyzer should be constructed from an array of keyword strings. The object of this class must store in its state this array of strings in the private field keywords.
+The NegativeTextAnalyzer must be constructed by the default constructor.
+TooLongTextAnalyzer must be constructed from int with the maximum allowed comment length. An object of this class must keep this number in its state in a private field maxLength.
+Surely you have already noticed that SpamAnalyzer and NegativeTextAnalyzer are very similar - they both check the text for the presence of any keywords (in case of spam, we get them from the constructor, in the case of negative text, we know in advance a set of sad emoticons) and in case of finding one return Label from keywords (SPAM and NEGATIVE_TEXT, respectively), and if nothing was found, return OK.
+Let's abstract this logic into an abstract KeywordAnalyzer class as follows:
+Let's select two abstract methods getKeywords and getLabel, one of which will return a set of keywords, and the second a label, which should be used to mark positive events. We do not need to expose these methods to class consumers, so we will leave access to them only for descendants.
+Let's implement processText so that it only depends on getKeywords and getLabel.
+Let SpamAnalyzer and NegativeTextAnalyzer inherit KeywordAnalyzer and implement abstract methods.
+
+The final touch is to write a checkLabels method that will return a label for a comment on a set of text parsers. checkLabels should return the first non-OK label in the order of the given parser set, and OK if all parsers returned OK.
+Please use the default access modifier for all classes.
+Finally, implement the KeywordAnalyzer, SpamAnalyzer, NegativeTextAnalyzer, and TooLongTextAnalyzer classes and the checkLabels method. TextAnalyzer and Label are already connected, you won't need extra imports.
+*/
+public static Label checkLabels(TextAnalyzer[] analyzers, String text) {
+
+        Label currentLabel = Label.OK;
+
+        for (TextAnalyzer analyzer : analyzers) {
+
+            currentLabel = analyzer.processText(text);
+
+            if (!currentLabel.equals(Label.OK)) {
+                break;
+            }
+        }
+
+        return currentLabel;
+
+}
+
+abstract class KeywordAnalyzer implements TextAnalyzer {
+    protected abstract String[] getKeywords();
+    protected abstract Label getLabel();
+    
+    public Label processText(String text) {
+        String[] keywords = getKeywords();
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) {
+                return getLabel();
+            }
+        }
+        return Label.OK;
+    }
+}
+
+class SpamAnalyzer extends KeywordAnalyzer{
+    private final String[] keywords;
+    
+    SpamAnalyzer(String[] words){
+        keywords = words;
+    }
+    
+    public String[] getKeywords(){
+        return keywords;
+    }
+    
+    public Label getLabel() {
+        return Label.SPAM;
+    }
+    
+}
+
+class NegativeTextAnalyzer extends KeywordAnalyzer{
+    private final String[] keywords;
+    
+    NegativeTextAnalyzer(){
+        keywords = new String[] {":(","=(",":|"};
+    }
+    
+    public String[] getKeywords(){
+        return keywords;
+    }
+    
+    public Label getLabel() {
+        return Label.NEGATIVE_TEXT;
+    }
+}
+
+class TooLongTextAnalyzer implements TextAnalyzer{
+    private int maxLength;
+    public TooLongTextAnalyzer(int n){
+        maxLength = n;
+    }
+    public Label processText(String text) {
+        if (text.length() > maxLength) {
+            return Label.TOO_LONG;
+        }
+        return Label.OK;
+    }
+}
+
+
+
