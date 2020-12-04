@@ -1,0 +1,39 @@
+import java.util.*;
+import java.lang.*;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        int root = -1;
+        int height;
+        int maxHeight = 0;
+        int parent;
+        int[] nodes = new int[input.nextInt()];
+
+        for (int i = 0; i < nodes.length; i++) {
+            int node = input.nextInt();
+            if(node == -1){
+                root = i;
+            }
+            nodes[i] = node;
+        }
+        
+        for (int i : nodes){
+            parent = i;
+            height = 1;
+            while (true) {
+                if (parent != -1){
+                    height++;
+                    parent = nodes[parent];
+                }
+                else {
+                    if(height > maxHeight){
+                        maxHeight = height;
+                    }
+                    break;
+                }
+            }
+        }
+        System.out.println(maxHeight);
+    }
+}
