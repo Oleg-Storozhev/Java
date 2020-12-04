@@ -1,0 +1,46 @@
+import java.util.*;
+import java.lang.*;
+
+class Main {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        String a = input.nextLine();
+        Stack<Character> stack = new Stack<>();
+        Stack<Integer> number = new Stack<>();
+        int num = 1;
+        boolean check = true;
+        boolean check2 = true;
+        for(char i : a.toCharArray()){
+            if(i == '(' || i == '[' || i == '{'){
+                number.push(num);
+                stack.push(i);
+            }
+            else if (i != ')' && i != ']' && i != '}'){
+                num++;
+                continue;
+            }
+            else {
+                if (stack.empty()) {
+                    System.out.print(num);
+                    check = false;
+                    break;
+                }
+                char top = stack.pop();
+                number.pop();
+                if ((top == '[' && i != ']') || (top == '(' && i != ')') || (top == '{' && i != '}')) {
+                    System.out.print(num);
+                    check = false;
+                    check2 = false;
+                    break;
+                }
+            }
+            num++;
+        }
+        if(check && stack.empty()) {
+            System.out.print("Success");
+        }
+        else if(!stack.empty() && check2){
+            System.out.print(number.peek());
+        }
+    }
+}
