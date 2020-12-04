@@ -1,0 +1,317 @@
+import java.util.Scanner;
+
+public class Ideone{
+    // Цвета
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+
+    // множество состояний одной клетки
+    enum CellState { Empty, Deck, Miss, HitDeck }
+
+    // множество состояний корабля
+    enum ShipState { Destroyed, ShipHit, Safe }
+
+    static class GameBoardCell {
+        private int _x, _y;         // координаты клетки
+        private CellState _state;   // состояние клетки
+        public GameBoardCell() { // конструктор
+            _x = 0;
+            _y = 0;
+            _state = CellState.Empty;
+        }
+
+        // функция устанавливает x-кординату клети
+        public void SetX(int x) {
+            _x = x;
+        }
+
+        // функция устанавливает y-кординату клети
+        public void SetY(int y) {
+            _y = y;
+        }
+
+        // функция устанавливает состояние клети
+        public void SetState(CellState state) {
+            _state = state;
+        }
+
+        // функция возвращает состояние текуйщей клетки
+        public CellState GetState() {
+            return _state;
+        }
+
+        // функция возвращает x текуйщей клетки
+        public int GetX() {
+            return _x;
+        }
+
+        // функция возвращает y текуйщей клетки
+        public int GetY() {
+            return _y;
+        }
+
+        // функция - проверка попадания в клетку
+        public boolean TryHit(int x, int y) {
+            return x == _x && y == _y && _state != CellState.HitDeck;
+        }
+
+        // функция печати одной клетки, в зависимости от ее состояния
+        public void Print() {
+            char a = ' ';
+            if (_state == CellState.Empty) {
+                System.out.print(a);
+            }
+            else if (_state == CellState.HitDeck) {
+                System.out.print(ANSI_RED + "X");
+            }
+            else if (_state == CellState.Deck) {
+                System.out.print(a);
+            }
+            else {
+                System.out.print(ANSI_PURPLE + "*");
+            }
+        }
+    }
+
+
+    static class Ship {
+        private GameBoardCell[] _cells;  // клетки корабля
+        private ShipState _state;   // состояние корабля
+        private int _size;
+        public Ship() {
+            _cells = null;
+            _size = 0;
+        }
+
+        public void Create(GameBoard gameBoard, int size, int x, int y, boolean horizontal) {
+            _size = size;
+            _cells = new GameBoardCell[size];
+            for(int i = 0; i < _size; i++){
+                _cells[i] = new GameBoardCell();
+            }
+            // заполняем клетки в зависимости от начала координат корябля и его направления
+            for (int i = 0; i < size; i++) {
+                if (horizontal) {
+                    _cells[i].SetX(x + i);
+                    _cells[i].SetY(y);
+                    gameBoard.SetState(x + i, y, CellState.Deck);
+                }
+                else {
+                    _cells[i].SetX(x);
+                    _cells[i].SetY(y + i);
+                    gameBoard.SetState(x, y + i, CellState.Deck);
+                }
+            }
+        }
+
+        // функция вощвращает состояние корабля, выполнив проверку целостности всех палуб
+        public ShipState GetState() {
+            // считаем число попаданий
+            int hitCount = 0;
+            for (int i = 0; i < _size; i++)
+                if (_cells[i].GetState() == CellState.HitDeck)
+                    hitCount++;
+
+            // сверяем число попаданий с числом палуб
+            if (hitCount == 0)  // если не попали - корабль цел
+                _state = ShipState.Safe;
+            else if (hitCount < _size)  // если попали но меньше раз, чем число палуб, то ранен
+                _state = ShipState.ShipHit;
+            else
+                _state = ShipState.Destroyed; // иначе уничтожен
+
+            return _state;
+        }
+
+        // функция выстрела по корабрю, возвращает состояние корябля, после выстрела
+        public void Shoot(GameBoard gameBoard, int x, int y) {
+            for (int i = 0; i < _size; i++)
+                if (_cells[i].TryHit(x, y)) {
+                    _cells[i].SetState(CellState.HitDeck);
+                    gameBoard.SetState(x, y, CellState.HitDeck);
+                    break;
+                }
+            if (GetState() == ShipState.Destroyed) {
+                for (int i = 0; i < _size; i++) {
+                    int localX = _cells[i].GetX();
+                    int localY = _cells[i].GetY();
+                    if (localX - 1 >= 0 && localY - 1 >= 0 && !gameBoard.IsDeck(localX - 1, localY - 1))
+                        gameBoard.SetState(localX - 1, localY - 1, CellState.Miss);
+                    if (localX - 1 >= 0 && !gameBoard.IsDeck(localX - 1, localY))
+                        gameBoard.SetState(localX - 1, localY, CellState.Miss);
+                    if (localX - 1 >= 0 && localY + 1 < gameBoard.GetSize() && !gameBoard.IsDeck(localX - 1, localY + 1))
+                        gameBoard.SetState(localX - 1, localY + 1, CellState.Miss);
+
+                    if (localY - 1 >= 0 && !gameBoard.IsDeck(localX, localY - 1))
+                        gameBoard.SetState(localX, localY - 1, CellState.Miss);
+                    if (localY + 1 < gameBoard.GetSize() && !gameBoard.IsDeck(localX, localY + 1))
+                        gameBoard.SetState(localX, localY + 1, CellState.Miss);
+
+                    if (localX + 1 < gameBoard.GetSize() && localY - 1 >= 0 && !gameBoard.IsDeck(localX + 1, localY - 1))
+                        gameBoard.SetState(localX + 1, localY - 1, CellState.Miss);
+                    if (localX + 1 < gameBoard.GetSize() && !gameBoard.IsDeck(localX + 1, localY))
+                        gameBoard.SetState(localX + 1, localY, CellState.Miss);
+                    if (localX + 1 < gameBoard.GetSize() && localY + 1 < gameBoard.GetSize() && !gameBoard.IsDeck(localX + 1, localY + 1))
+                        gameBoard.SetState(localX + 1, _cells[i].GetY() + 1, CellState.Miss);
+                }
+            }
+        }
+
+        public boolean TryHit(int x, int y) {
+            for (int i = 0; i < _size; i++)
+                if (_cells[i].TryHit(x, y))
+                    return true;
+            return false;
+        }
+    }
+
+    static class GameBoard {
+        private static final int _size = 10;            // размер игорового поля
+        private static final int _4DeckShipCount = 1;   // число 4-х палубных
+        private static final int _3DeckShipCount = 2;   // число 3-х палубных
+        private static final int _2DeckShipCount = 3;   // число 2-х палубных
+        private static final int _1DeckShipCount = 4;   // число 1-х палубных
+        private static final int _shipsCount = _4DeckShipCount + _3DeckShipCount + _2DeckShipCount + _1DeckShipCount;   // число кораблей
+        GameBoardCell[][] _cells = new GameBoardCell[_size][_size]; // клетки игрового поля
+        Ship[] _ships = new Ship[_shipsCount];   // корабли
+
+        // функция создание игрового поля
+        public void Generate() {
+            // заполняем игровое поле пустыми клетками
+            for (int i = 0; i < _size; i++)
+                for (int j = 0; j < _size; j++)
+                    _cells[i][j] = new GameBoardCell();
+
+            int idx = 0;
+            for(int i = 0; i < _shipsCount; i++){
+                _ships[i] = new Ship();
+            }
+            // расставяем 4-х палубные
+            _ships[idx++].Create(this, 4, 0, 0, true);
+            // расставяем 3-х палубные
+            _ships[idx++].Create(this, 3, 0, 2, false);
+            _ships[idx++].Create(this, 3, 8, 1, false);
+            // расставяем 2-х палубные
+            _ships[idx++].Create(this, 2, 3, 9, true);
+            _ships[idx++].Create(this, 2, 2, 6, true);
+            _ships[idx++].Create(this, 2, 6, 5, true);
+            // расставяем 1-х палубные
+            _ships[idx++].Create(this, 1, 4, 2, true);
+            _ships[idx++].Create(this, 1, 8, 8, true);
+            _ships[idx++].Create(this, 1, 0, 8, true);
+            _ships[idx++].Create(this, 1, 6, 0, true);
+
+        }
+        public GameBoard() {
+            Generate();
+        }
+
+        // функция установки статуса клетки игровго поля
+        public void SetState(int x, int y, CellState state) {
+            _cells[y][x].SetState(state);
+        }
+
+        // функция возвращает является ли клетка палубой
+        public boolean IsDeck(int x, int y) {
+            return _cells[y][x].GetState() == CellState.Deck || _cells[y][x].GetState() == CellState.HitDeck;
+        }
+
+        // функция печати игрового поля
+        public void Print() {
+            char sym = 'A';
+            System.out.print("  ");
+            for (int a = 0; a < _size; a++) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.out.print(ANSI_BLUE + " " + sym);
+                sym++;
+            }
+            System.out.print("\n");
+            int num = 0;
+            for (int i = 0; i < _size; i++) {
+                System.out.print(ANSI_BLUE + ++num);
+                if (num != 10)
+                    System.out.print(ANSI_GREEN + " |");
+                else
+                    System.out.print(ANSI_GREEN + "|");
+                for (int j = 0; j < _size; j++) { // анимация появления поля
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    _cells[i][j].Print();
+                    System.out.print(ANSI_GREEN + "|");
+                }
+                System.out.print("\n");
+            }
+        }
+
+        // функция возвращает число кдеток игровой области
+        int GetCount() {
+            return _size * _size;
+        }
+
+        // функция возвращает размер игровой области
+        int GetSize() {
+            return _size;
+        }
+
+        // функция - выстрел в игрове поле
+        void Shoot(int x, int y) {
+            // просмотрим все корабли
+            for (int i = 0; i < _shipsCount; i++)
+                // проверим попадание
+                if (_ships[i].TryHit(x, y)) {
+                    // если попадаем - стреляем по кораблю
+                    _ships[i].Shoot(this, x, y);
+                    break;
+                }
+                else {
+                    // иначе засчитываем промах
+                    _cells[y][x].SetState(CellState.Miss);
+                }
+        }
+
+        // функция провекри - уничтожены ли все корабли на поле
+        public boolean AllShipsDestroyed() {
+            // обход всех кораблей
+            for (int i = 0; i < _shipsCount; i++)
+                // если хотя бы один не уничтожен, вернем false
+                if (_ships[i].GetState() != ShipState.Destroyed)
+                    return false;
+            return true;    // иначе true
+        }
+    }
+
+
+    public static void main(String[] args){
+        GameBoard gameBoard = new GameBoard(); // начинаем новую игру и создаем поле
+        Scanner in = new Scanner(System.in);
+        do { // Пока все корабли не уничтожим - не победим
+            int x = -1;
+            int y = -1;
+            while (x > 9 || x < 0 || y > 10 || y < 0) {
+                System.out.flush(); // очищаем старое поле
+                gameBoard.Print(); // показываем новое поле
+                System.out.print("Enter the letter" + ANSI_RED+ "(A-J):\n  ");
+
+                String sym = in.next(); // вводим символ
+                sym.charAt(0);
+                sym = sym.toLowerCase(); // из строки в символ из символа находим индекс строки
+                x = sym.charAt(0);
+                x -= 97;
+                System.out.print(ANSI_GREEN + "Enter number "+ ANSI_RED + "(1-10):\n  ");
+                y = in.nextInt();
+            }
+            gameBoard.Shoot(x, y-1); // выстрел
+            System.out.flush(); // очистака
+        } while (!gameBoard.AllShipsDestroyed());
+        System.out.print(ANSI_RED+ "YOU WIN"); // победа
+    }
+}
