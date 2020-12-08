@@ -1,0 +1,45 @@
+import java.util.*;
+
+public class Main {
+    static StringBuilder bld = new StringBuilder();
+    static int l = 0;
+    
+    static void change(int i, int n, int a[]){
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+        int min = i;
+
+        if (left < n) {
+            min = left;
+        }
+
+        if (right < n && a[right] < a[left]) {
+            min = right;
+        }
+
+        if (i != min && a[i] > a[min]) {
+            int temp = a[i];
+            a[i] = a[min];
+            a[min] = temp;
+            l++;
+            bld.append(i + " " + min + "\n");
+            change(min,n, a);
+        }
+    }
+
+    public static void main(String[] args){
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        int a[] = new int[n];
+
+        for(int i = 0; i < n; i++){
+            a[i] = in.nextInt();
+        }
+
+        for(int i = n-1; i >= 0; i--){
+            change(i,n,a);
+        }
+        System.out.println(l);
+        System.out.print(bld);
+    }
+}
