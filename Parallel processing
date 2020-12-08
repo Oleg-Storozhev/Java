@@ -1,0 +1,53 @@
+import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class Main {
+    private static class Pair_process implements Comparable<Pair_process>{
+        int n;
+        long time;
+        public Pair_process(long time, int n) {
+            this.n = n;
+            this.time = time;
+        }
+        public int getN() {
+            return n;
+        }
+        public long getTime() {
+            return time;
+        }
+        public int compareTo(Pair_process o) {
+            if (time != o.getTime()) {
+                return Long.compare(time, o.getTime());
+            } else {
+                return Long.compare(n, o.getN());
+            }
+        }
+    }
+
+    public static void main(String[] args){
+        Scanner in = new Scanner(System.in);
+        int proc = in.nextInt();
+        int number = in.nextInt();
+        ArrayList<Integer> a = new ArrayList<>(number);
+        for(int i = 0; i < number; i++){
+            a.add(in.nextInt());
+        }
+        long time;
+        int n;
+        Queue<Pair_process> queue;
+        StringBuilder sb = new StringBuilder();
+        queue = new PriorityQueue<>(proc);
+        for (int i = 0; i < proc; i++) {
+            queue.add(new Pair_process(0, i));
+        }
+        for (int i = 0; i < number; i++) {
+            sb.append(queue.peek().getN()).append(" ").append(queue.peek().getTime()).append("\n");
+            time = queue.peek().getTime();
+            n = queue.poll().getN();
+            queue.add(new Pair_process(time + a.get(i), n));
+        }
+        System.out.print(sb.toString());
+    }
+}
