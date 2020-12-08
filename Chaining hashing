@@ -1,0 +1,74 @@
+import java.util.*;
+
+public class Main{
+    static int m;
+    static long hashFunc(String text){
+        long hash = 0;
+        char[] letter = text.toCharArray();
+        long x = 1;
+        int p = 1000000007;
+        for (int i = 0; i < letter.length; i++) {
+            hash += Math.abs((letter[i] * x) % p);
+            x *= 263;
+            x %= p;
+        }
+        return (Math.abs((hash % p) % m));
+    }
+
+    public static void main(String[] args){
+        Scanner in = new Scanner(System.in);
+        StringBuilder bld = new StringBuilder();
+
+        Map<Long, Stack<String>> book = new HashMap<>();
+
+        m = in.nextInt();
+        int n = in.nextInt();
+
+        String word1, word2;
+
+        for (int i = 0; i < n; i++) {
+            word1 = in.next();
+            word2 = in.next();
+
+            long w = hashFunc(word2);
+            if (word1.equals("add")) {
+                if (book.containsKey(w)) {
+                    if (!book.get(w).contains(word2)) {
+                        book.get(w).push(word2);
+                    }
+                }
+                else {
+                    book.put(w, new Stack<>());
+                    book.get(w).push(word2);
+                }
+            }
+
+            if (word1.equals("find")) {
+                if (book.containsKey(w) && book.get(w).contains(word2)) {
+                    bld.append("yes\n");
+                }
+                else {
+                    bld.append("no\n");
+                }
+            }
+
+            if (word1.equals("del")) {
+                if (book.containsKey(w)) {
+                    book.get(w).remove(word2);
+                }
+            }
+
+            if(word1.equals("check")) {
+                long k = Long.parseLong(word2);
+                if (book.containsKey(k)){
+                    for (int y = book.get(k).size() - 1; y >= 0; y--) {
+                        bld.append(book.get(k).get(y) + " ");
+                    }
+                    bld.deleteCharAt(bld.length() - 1);
+                }
+                bld.append("\n");
+            }
+        }
+        System.out.print(bld.toString());
+    }
+}
