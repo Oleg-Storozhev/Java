@@ -1,0 +1,10 @@
+public class Ideone {
+    static public String tringle(int x, int y) {
+        Long id = Long.valueOf((x+y-1)*(x+y-2)/2+y);
+        return id.toString();
+    }
+
+    public static void main(String args[]){
+        System.out.print(tringle(10,5));
+    }
+}
